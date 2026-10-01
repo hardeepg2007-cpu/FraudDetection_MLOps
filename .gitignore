@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local tracking and generated outputs
+mlruns/
+mlflow.db
+predictions.csv
+
+# Large training datasets (not needed by the deployed API)
+data/*.csv
+data/*.csv.gz
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/

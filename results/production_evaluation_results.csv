@@ -1,0 +1,2 @@
+model,roc_auc,pr_auc,scale_pos_weight,threshold
+xgboost_production,0.9999991568562354,0.9998779122992406,1051.0683272790175,0.5

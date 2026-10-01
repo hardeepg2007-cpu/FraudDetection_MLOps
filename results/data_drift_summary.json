@@ -1,0 +1,6 @@
+{
+    "dataset_drift": false,
+    "drifted_columns": 5,
+    "total_columns": 20,
+    "drift_percentage": 25.0
+}

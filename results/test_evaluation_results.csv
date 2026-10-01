@@ -1,0 +1,2 @@
+roc_auc,pr_auc,threshold,true_negatives,false_positives,false_negatives,true_positives
+0.9999999818912634,0.9999987261211408,0.5,88212,2,1,1251

@@ -1,0 +1,27 @@
+name: Automatic MLOps Pipeline
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+jobs:
+  mlops:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy scikit-learn xgboost mlflow evidently
+
+      - name: Run MLOps pipeline
+        run: |
+          python run_mlops_pipeline.py

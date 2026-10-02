@@ -12,6 +12,7 @@ import {
   Server,
   Database,
   BarChart3,
+  Download,
   FileSearch,
 } from "lucide-react";
 import {
@@ -261,6 +262,61 @@ function CSVAnalysis() {
     }
   };
 
+  const handleDownload = () => {
+  if (!results.length) {
+    return;
+  }
+
+  const headers = [
+    "step",
+    "type",
+    "amount",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "prediction",
+    "fraud_probability",
+  ];
+
+  const csvRows = results.map((row) => [
+    row.step ?? "",
+    row.type ?? "",
+    row.amount ?? "",
+    row.oldbalanceOrg ?? "",
+    row.newbalanceOrig ?? "",
+    row.oldbalanceDest ?? "",
+    row.newbalanceDest ?? "",
+    row.prediction ?? "",
+    row.fraud_probability ?? "",
+  ]);
+
+  const csvContent = [
+    headers.join(","),
+    ...csvRows.map((row) =>
+      row
+        .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+        .join(",")
+    ),
+  ].join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "fraud_predictions.csv";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+};
+
   return (
     <div>
       <div className="pageIntro">
@@ -363,8 +419,9 @@ function CSVAnalysis() {
         </div>
       )}
 
-      {results.length > 0 && (
+            {results.length > 0 && (
         <div className="panel resultsPanel">
+
           <div className="panelHeader">
             <div>
               <h3>Prediction Results</h3>
@@ -374,7 +431,13 @@ function CSVAnalysis() {
               </p>
             </div>
 
-            <BarChart3 size={21} />
+            <button
+              className="downloadButton"
+              onClick={handleDownload}
+            >
+              <Download size={17} />
+              Download CSV
+            </button>
           </div>
 
           <div className="tableWrapper">
@@ -1339,7 +1402,6 @@ function Monitoring() {
           marginBottom: "28px",
         }}
       >
-
         {/* DATA DRIFT */}
         <div
           style={{
@@ -1378,13 +1440,13 @@ function Monitoring() {
                 }}
               >
                 {dataDriftAvailable
-  ? dataDrift?.dataset_drift
-    ? "Dataset Drift Detected"
-    : "Dataset Stable"
-  : "Data Drift Unavailable"}
+                  ? dataDrift?.dataset_drift
+                    ? "Dataset Drift Detected"
+                    : "Dataset Stable"
+                  : "Data Drift Unavailable"}
               </h2>
 
-              <p
+              <div
                 style={{
                   margin: 0,
                   color: "#9ca3af",
@@ -1392,19 +1454,21 @@ function Monitoring() {
                 }}
               >
                 Monitoring input feature changes
+
                 {dataDriftAvailable && dataDrift && (
-  <p
-    style={{
-      margin: "8px 0 0",
-      color: "#6b7280",
-      fontSize: "13px",
-      fontWeight: "600",
-    }}
-  >
-    {dataDrift.drifted_columns} of {dataDrift.total_columns} features drifted
-  </p>
-)}
-              </p>
+                  <div
+                    style={{
+                      margin: "8px 0 0",
+                      color: "#6b7280",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {dataDrift.drifted_columns} of{" "}
+                    {dataDrift.total_columns} features drifted
+                  </div>
+                )}
+              </div>
             </div>
 
             <div
@@ -1440,7 +1504,6 @@ function Monitoring() {
             ● Available
           </div>
         </div>
-
         {/* CONCEPT DRIFT */}
         <div
           style={{
@@ -1472,13 +1535,6 @@ function Monitoring() {
               </p>
 
               <h2
-                style={{
-                  margin: "8px 0 5px",
-                  fontSize: "21px",
-                  color: "#111827",
-                }}
-              >
-                <h2
   style={{
     margin: "8px 0 5px",
     fontSize: "21px",
@@ -1489,17 +1545,16 @@ function Monitoring() {
     ? "Performance Monitored"
     : "Concept Drift Unavailable"}
 </h2>
-              </h2>
 
-              <p
-                style={{
-                  margin: 0,
-                  color: "#9ca3af",
-                  fontSize: "14px",
-                }}
-              >
-                Performance across datasets
-              </p>
+<p
+  style={{
+    margin: 0,
+    color: "#9ca3af",
+    fontSize: "14px",
+  }}
+>
+  Performance across datasets
+</p>
             </div>
 
             <div

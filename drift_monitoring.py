@@ -142,17 +142,41 @@ print("\nReport saved to:")
 print(report_path)
 
 # ============================================================
-# SAVE DATA DRIFT SUMMARY
+# DATA DRIFT SUMMARY
 # ============================================================
 
-drifted_columns = 5
 total_columns = len(MODEL_FEATURES)
 
+# Get the drift results from Evidently
+drift_results = snapshot.dict()
+
+drifted_columns = 0
+
+for metric in drift_results.get("metrics", []):
+    metric_value = metric.get("value")
+
+    if isinstance(metric_value, dict):
+        if "count" in metric_value:
+            drifted_columns = metric_value["count"]
+
+        elif "share" in metric_value:
+            drifted_columns = round(
+                metric_value["share"] * total_columns
+            )
+
+dataset_drift = (
+    drifted_columns / total_columns >= 0.50
+)
+
+drift_percentage = (
+    drifted_columns / total_columns
+) * 100
+
 data_drift_summary = {
-    "dataset_drift": False,
+    "dataset_drift": dataset_drift,
     "drifted_columns": drifted_columns,
     "total_columns": total_columns,
-    "drift_percentage": (drifted_columns / total_columns) * 100
+    "drift_percentage": drift_percentage
 }
 
 summary_path = os.path.join(
@@ -165,3 +189,32 @@ with open(summary_path, "w") as f:
 
 print("\nData drift summary saved to:")
 print(summary_path)
+
+# ============================================================
+# RETRAINING TRIGGER
+# ============================================================
+
+RETRAINING_THRESHOLD = 25.0
+
+if drift_percentage >= RETRAINING_THRESHOLD:
+
+    print("\n⚠️ RETRAINING TRIGGERED")
+    print(
+        f"Drift percentage: {drift_percentage:.1f}%"
+    )
+    print(
+        f"Threshold: {RETRAINING_THRESHOLD:.1f}%"
+    )
+    print(
+        "Recommendation: Retraining should be started."
+    )
+
+else:
+
+    print("\n✅ NO RETRAINING REQUIRED")
+    print(
+        f"Drift percentage: {drift_percentage:.1f}%"
+    )
+    print(
+        f"Threshold: {RETRAINING_THRESHOLD:.1f}%"
+    )

@@ -21,3 +21,4 @@ data/*.csv.gz
 # Frontend dependencies and build output
 frontend/node_modules/
 frontend/dist/
+financial-fraud-detection-dataset.zip

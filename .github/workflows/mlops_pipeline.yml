@@ -20,7 +20,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas numpy scikit-learn xgboost mlflow evidently
+          pip install pandas numpy scikit-learn xgboost mlflow evidently kaggle
+
+      - name: Download Kaggle dataset
+        env:
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: |
+          kaggle datasets download -d sriharshaeedala/financial-fraud-detection-dataset -p .
+
+      - name: Preprocess dataset
+        run: |
+          python preprocess_data.py
 
       - name: Run MLOps pipeline
         run: |
